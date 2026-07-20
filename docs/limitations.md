@@ -47,6 +47,14 @@
 - **"Ask the Data" is a fixed, finite catalog** of pre-tested questions by
   design, not a free-form query interface — this is a deliberate scope
   boundary from the spec, not a temporary limitation.
+- **`experience_level` and `normalized_title` are not yet extracted.** Both
+  columns exist in the `jobs` schema but no adapter or processing step
+  populates them today — this is a known gap, not a bug. `experience_level`
+  (e.g., Entry Level / Associate / Senior / Director) is a genuine candidate
+  follow-up: a rule-based keyword extractor from the title (similar to role
+  classification) would cover most cases, and Goldman Sachs' raw payload
+  already carries a `corporateTitle` field (Analyst/Associate/VP) that could
+  be mapped directly without inference.
 
 ## Compliance constraints
 This project operates **only on public job-listing information**. It does **not**

@@ -143,7 +143,11 @@ extractors · approved Bright Data proxy transport · broader company coverage �
 period-over-period growth folded into the narrative summaries · a reviewable
 role-classification evidence table (`role_taxonomy` is reserved for this,
 currently unused) · pinning BNY's exact Candidate Experience `siteNumber` and
-detail-URL pattern with production-grade certainty.
+detail-URL pattern with production-grade certainty · **experience-level
+extraction** (Entry Level / Associate / Senior / Director), e.g. a rule-based
+title-keyword extractor plus mapping Goldman Sachs' raw `corporateTitle`
+field directly — schema column already exists (`jobs.experience_level`),
+extraction logic does not yet.
 
 ---
 Built milestone-by-milestone; see the milestone status in
