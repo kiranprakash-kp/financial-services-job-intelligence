@@ -5,10 +5,22 @@ through these, never around them.
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from sqlalchemy import func, select
 
 from ..persistence import orm_models as m
 from ..persistence.database import get_sessionmaker
+
+# A "running" run older than this has almost certainly been interrupted (worker
+# killed, terminal closed mid-run) rather than genuinely still in progress --
+# flagged in the Pipeline Operations dashboard instead of silently looking done.
+STALE_RUNNING_AFTER_HOURS = 2.0
+# A run whose discovered count drops below this fraction of the company's most
+# recent prior run is flagged as possibly incomplete (e.g. an interrupted run
+# that quietly wrote partial data) -- separate from the DEGRADED status, which
+# only applies to a *completed* run's own closure-reconciliation decision.
+LOW_COUNT_WARNING_RATIO = 0.75
 
 
 def _company_id(session, company_code: str) -> int | None:
@@ -159,6 +171,38 @@ def last_successful_run(company_code: str | None = None) -> dict | None:
         }
 
 
+def _run_flags(session, run: m.IngestionRun) -> list[str]:
+    flags: list[str] = []
+
+    if run.status == "running":
+        age_hours = (datetime.utcnow() - run.started_at).total_seconds() / 3600
+        if age_hours > STALE_RUNNING_AFTER_HOURS:
+            flags.append(
+                f"Stuck? Started {age_hours:.1f}h ago and never reached a terminal "
+                "status -- likely interrupted (worker killed mid-run), not still running."
+            )
+
+    if run.jobs_discovered:
+        prior_count = session.scalar(
+            select(m.IngestionRun.jobs_discovered)
+            .where(
+                m.IngestionRun.company_id == run.company_id,
+                m.IngestionRun.id != run.id,
+                m.IngestionRun.jobs_discovered > 0,
+                m.IngestionRun.started_at < run.started_at,
+            )
+            .order_by(m.IngestionRun.started_at.desc())
+            .limit(1)
+        )
+        if prior_count and run.jobs_discovered < prior_count * LOW_COUNT_WARNING_RATIO:
+            flags.append(
+                f"Discovered only {run.jobs_discovered} vs {prior_count} in a previous "
+                "run -- possibly incomplete (interrupted run or a real site change)."
+            )
+
+    return flags
+
+
 def recent_ingestion_runs(limit: int = 20) -> list[dict]:
     Session = get_sessionmaker()
     with Session() as session:
@@ -182,6 +226,7 @@ def recent_ingestion_runs(limit: int = 20) -> list[dict]:
                 "jobs_closed": run.jobs_closed,
                 "jobs_failed": run.jobs_failed,
                 "error_summary": run.error_summary,
+                "flags": "; ".join(_run_flags(session, run)),
             }
             for run, code in rows
         ]

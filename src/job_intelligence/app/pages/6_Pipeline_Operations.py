@@ -34,6 +34,13 @@ st.divider()
 st.subheader("Recent ingestion runs")
 runs = metrics.recent_ingestion_runs(limit=30)
 if runs:
+    flagged = [r for r in runs if r["flags"]]
+    if flagged:
+        st.warning(
+            f"⚠️ {len(flagged)} run(s) below look suspicious — see the **flags** "
+            "column for why (e.g. stuck at 'running', or a job count much lower "
+            "than a previous run for that company)."
+        )
     st.dataframe(pd.DataFrame(runs), width="stretch")
 else:
     st.info("No ingestion runs recorded yet.")
