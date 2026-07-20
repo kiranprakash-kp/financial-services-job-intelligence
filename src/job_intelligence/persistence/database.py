@@ -35,12 +35,22 @@ def get_engine() -> Engine:
     if _engine is None:
         settings = get_settings()
         _ensure_sqlite_dir(settings.database_url)
-        _engine = create_engine(settings.database_url, future=True)
-        if settings.database_url.startswith("sqlite"):
-            # Enforce foreign keys on SQLite (off by default).
+        is_sqlite = settings.database_url.startswith("sqlite")
+        # SQLite allows only one writer at a time. WAL mode + a generous
+        # busy_timeout let concurrent company workflows (Milestone 5's
+        # concurrent fan-out) wait out a brief lock instead of immediately
+        # raising "database is locked" — see also the short-transaction
+        # discipline in app/services.py, which keeps how long each writer
+        # actually holds the lock to a minimum.
+        connect_args = {"timeout": 30} if is_sqlite else {}
+        _engine = create_engine(settings.database_url, future=True, connect_args=connect_args)
+        if is_sqlite:
+
             @event.listens_for(_engine, "connect")
-            def _fk_on(dbapi_conn, _rec):
+            def _sqlite_pragmas(dbapi_conn, _rec):
                 dbapi_conn.execute("PRAGMA foreign_keys=ON")
+                dbapi_conn.execute("PRAGMA journal_mode=WAL")
+                dbapi_conn.execute("PRAGMA busy_timeout=30000")
 
         _Session = sessionmaker(bind=_engine, expire_on_commit=False, future=True)
     return _engine

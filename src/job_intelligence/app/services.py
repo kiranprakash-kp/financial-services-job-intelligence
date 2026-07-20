@@ -121,52 +121,60 @@ async def run_company_ingestion(
     invalid: list[InvalidRecord] = []
     error_summary: str | None = None
 
+    # Company id only — never hold a DB transaction open across the network
+    # calls below. SQLite allows exactly one writer at a time; with several
+    # companies' workflows running concurrently (Milestone 5's whole point),
+    # a transaction left open for the duration of a slow HTTP fetch starves
+    # the others and they time out waiting for the lock ("database is
+    # locked"). Each job's write below is therefore its own short-lived
+    # transaction, opened only after all network I/O for that job is done.
+    with unit_of_work() as uow:
+        company_id = uow.companies.ensure(cfg.code, cfg.name, cfg.career_site_url).id
+
     try:
-        with unit_of_work() as uow:
-            company_row = uow.companies.ensure(cfg.code, cfg.name, cfg.career_site_url)
-
-            async for discovered in adapter.discover_jobs(run_context):
-                result.jobs_discovered += 1
-                if on_progress is not None:
-                    on_progress(result.jobs_discovered)
-                try:
-                    raw = await adapter.fetch_job_detail(discovered, run_context)
-                    normalized = adapter.normalize(raw)
-                    result.jobs_fetched += 1
-                except JobIntelError as exc:
-                    result.jobs_failed += 1
-                    invalid.append(
-                        InvalidRecord(
-                            source_job_id=discovered.source_job_id,
-                            reason="fetch_or_normalize_error",
-                            detail=str(exc),
-                        )
+        async for discovered in adapter.discover_jobs(run_context):
+            result.jobs_discovered += 1
+            if on_progress is not None:
+                on_progress(result.jobs_discovered)
+            try:
+                raw = await adapter.fetch_job_detail(discovered, run_context)
+                normalized = adapter.normalize(raw)
+                result.jobs_fetched += 1
+            except JobIntelError as exc:
+                result.jobs_failed += 1
+                invalid.append(
+                    InvalidRecord(
+                        source_job_id=discovered.source_job_id,
+                        reason="fetch_or_normalize_error",
+                        detail=str(exc),
                     )
-                    continue
+                )
+                continue
 
-                if not normalized.has_valid_us_location:
-                    invalid.append(
-                        InvalidRecord(
-                            source_job_id=normalized.source_job_id,
-                            reason="no_valid_us_location",
-                            detail=normalized.primary_location.location_text
-                            if normalized.primary_location
-                            else None,
-                        )
+            if not normalized.has_valid_us_location:
+                invalid.append(
+                    InvalidRecord(
+                        source_job_id=normalized.source_job_id,
+                        reason="no_valid_us_location",
+                        detail=normalized.primary_location.location_text
+                        if normalized.primary_location
+                        else None,
                     )
-                    continue
+                )
+                continue
 
-                _, change_type = uow.jobs.upsert(normalized, company_row, run_id)
-                if change_type == JobChangeType.NEW:
-                    result.jobs_inserted += 1
-                elif change_type == JobChangeType.UNCHANGED:
-                    result.jobs_unchanged += 1
-                else:  # UPDATED or REOPENED
-                    result.jobs_updated += 1
+            with unit_of_work() as uow:
+                _, change_type = uow.jobs.upsert(normalized, company_id, run_id)
+            if change_type == JobChangeType.NEW:
+                result.jobs_inserted += 1
+            elif change_type == JobChangeType.UNCHANGED:
+                result.jobs_unchanged += 1
+            else:  # UPDATED or REOPENED
+                result.jobs_updated += 1
 
-            result.complete_result_set = dev_job_limit is None
-            result.status = "success"
-            result.invalid_records = invalid
+        result.complete_result_set = dev_job_limit is None
+        result.status = "success"
+        result.invalid_records = invalid
     except JobIntelError as exc:
         result.status = "failed"
         error_summary = str(exc)

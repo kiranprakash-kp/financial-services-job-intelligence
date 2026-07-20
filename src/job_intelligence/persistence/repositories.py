@@ -43,15 +43,15 @@ class JobRepository:
         )
 
     def upsert(
-        self, normalized: NormalizedJob, company: m.Company, ingestion_run_id: int | None = None
+        self, normalized: NormalizedJob, company_id: int, ingestion_run_id: int | None = None
     ) -> tuple[m.Job, JobChangeType]:
         now = datetime.utcnow()
-        existing = self.get(company.id, normalized.source_job_id)
+        existing = self.get(company_id, normalized.source_job_id)
         primary = normalized.primary_location
 
         if existing is None:
             job = m.Job(
-                company_id=company.id,
+                company_id=company_id,
                 source_job_id=normalized.source_job_id,
                 canonical_key=normalized.canonical_key,
                 key_source=normalized.key_source.value,
