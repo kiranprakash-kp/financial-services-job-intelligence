@@ -6,9 +6,17 @@
 - [x] **M3** — Wells Fargo vertical slice (adapter → normalize → SQLite), proven idempotent via a live dev-sample run
 - [x] **M4** — Goldman Sachs + BNY adapters (offline respx-tested; both verified live via reconnaissance)
 - [x] **M5** — Temporal workflows / activities / worker / schedule (tested against Temporal's real ephemeral test server)
-- [ ] **M6** — lifecycle, skills, role classification, analytics, summaries
+- [x] **M6** — lifecycle (grace-period closure), deterministic skills/role classification, analytics, summaries
 - [ ] **M7** — Streamlit pages, synthetic demo history, CSV exports
 - [ ] **M8** — lint/type/test, README verification, limitations & roadmap
+
+## Documented Milestone 6 simplification
+`analytics/summaries.py`'s narrative covers current active-job composition
+(role families, skills, locations) — all deterministic queries, no LLM. It
+does not yet compute period-over-period growth or the full recruiting-priority
+score (needs `monthly_company_metrics` populated across several periods),
+deferred to Milestone 7 where synthetic demo history gives the trend lines
+something to show.
 
 ## Documented Milestone 5 simplification
 The spec enumerates up to 13 fine-grained Activities per company (discover

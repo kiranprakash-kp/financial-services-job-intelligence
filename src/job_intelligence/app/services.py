@@ -28,8 +28,14 @@ from ..extraction.transport import TransportFactory
 from ..logging import get_logger
 from ..persistence import orm_models as m
 from ..persistence.unit_of_work import unit_of_work
+from ..processing import lifecycle
+from ..processing.role_classifier import RuleBasedRoleClassifier
+from ..processing.skills import TaxonomySkillExtractor
 
 log = get_logger("services.ingestion")
+
+_role_classifier = RuleBasedRoleClassifier()
+_skill_extractor = TaxonomySkillExtractor()
 
 _ADAPTER_BUILDERS = {}
 
@@ -131,9 +137,12 @@ async def run_company_ingestion(
     with unit_of_work() as uow:
         company_id = uow.companies.ensure(cfg.code, cfg.name, cfg.career_site_url).id
 
+    seen_source_job_ids: set[str] = set()
+
     try:
         async for discovered in adapter.discover_jobs(run_context):
             result.jobs_discovered += 1
+            seen_source_job_ids.add(discovered.source_job_id)
             if on_progress is not None:
                 on_progress(result.jobs_discovered)
             try:
@@ -163,8 +172,16 @@ async def run_company_ingestion(
                 )
                 continue
 
+            # Deterministic, taxonomy/rule-based — no LLM involved or required.
+            classification = _role_classifier.classify(normalized)
+            normalized.role_family = classification.role_family
+            normalized.role_subfamily = classification.role_subfamily
+            normalized.classification_confidence = classification.confidence
+            normalized.skills = _skill_extractor.extract(normalized)
+
             with unit_of_work() as uow:
-                _, change_type = uow.jobs.upsert(normalized, company_id, run_id)
+                job_row, change_type = uow.jobs.upsert(normalized, company_id, run_id)
+                uow.jobs.set_job_skills(job_row, normalized.skills)
             if change_type == JobChangeType.NEW:
                 result.jobs_inserted += 1
             elif change_type == JobChangeType.UNCHANGED:
@@ -175,6 +192,19 @@ async def run_company_ingestion(
         result.complete_result_set = dev_job_limit is None
         result.status = "success"
         result.invalid_records = invalid
+
+        # Closure reconciliation only ever runs after a complete, healthy
+        # crawl — never after a dev-limited/partial one, and never when this
+        # run's count dropped sharply vs. the last success (that marks the
+        # run DEGRADED and defers closure until reviewed, per spec).
+        if result.complete_result_set:
+            previous_count = lifecycle.previous_successful_discovered_count(company_id, run_id)
+            if lifecycle.is_degraded(result.jobs_discovered, previous_count):
+                result.status = "degraded"
+            else:
+                result.jobs_closed = lifecycle.reconcile_closures(
+                    company_id, seen_source_job_ids
+                )
     except JobIntelError as exc:
         result.status = "failed"
         error_summary = str(exc)
@@ -193,6 +223,7 @@ async def run_company_ingestion(
                 run_row.jobs_updated = result.jobs_updated
                 run_row.jobs_unchanged = result.jobs_unchanged
                 run_row.jobs_failed = result.jobs_failed
+                run_row.jobs_closed = result.jobs_closed
                 run_row.error_summary = error_summary
 
     log.info(
@@ -203,6 +234,7 @@ async def run_company_ingestion(
         updated=result.jobs_updated,
         unchanged=result.jobs_unchanged,
         failed=result.jobs_failed,
+        closed=result.jobs_closed,
         invalid=len(invalid),
     )
     return result

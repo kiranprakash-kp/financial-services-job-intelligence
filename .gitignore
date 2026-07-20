@@ -13,6 +13,8 @@ __pycache__/
 
 # Local data — never commit collected data, debug payloads, or browser profiles
 data/*.db
+data/*.db-shm
+data/*.db-wal
 data/*.sqlite3
 data/exports/*
 data/debug/*

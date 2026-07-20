@@ -13,7 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..domain.enums import JobChangeType
-from ..domain.models import NormalizedJob
+from ..domain.models import ExtractedSkill, NormalizedJob
 from . import orm_models as m
 
 
@@ -144,6 +144,32 @@ class JobRepository:
             self._session.delete(loc)
         self._session.flush()
         self._add_locations(job, normalized)
+
+    def set_job_skills(self, job: m.Job, skills: list[ExtractedSkill]) -> None:
+        """Replace a job's skill links with the freshly extracted set."""
+        for existing in list(job.job_skills):
+            self._session.delete(existing)
+        self._session.flush()
+
+        for extracted in skills:
+            skill_row = self._session.scalar(
+                select(m.Skill).where(m.Skill.canonical_name == extracted.canonical_name)
+            )
+            if skill_row is None:
+                skill_row = m.Skill(
+                    canonical_name=extracted.canonical_name, category=extracted.category
+                )
+                self._session.add(skill_row)
+                self._session.flush()
+            self._session.add(
+                m.JobSkill(
+                    job_id=job.id,
+                    skill_id=skill_row.id,
+                    source=extracted.source,
+                    confidence=extracted.confidence,
+                    evidence_text=extracted.evidence_text,
+                )
+            )
 
     def _add_snapshot(
         self,
