@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<source>
+  <publisher>WELLS FARGO BANK</publisher>
+  <publisherUrl>https://www.wellsfargojobs.com</publisherUrl>
+  <lastBuildDate>Mon, 20 Jul 2026 17:51:47 GMT</lastBuildDate>
+  <job>
+    <title><![CDATA[Software Engineer]]></title>
+    <date><![CDATA[Thu, 21 May 2026 00:00:00 GMT]]></date>
+    <referencenumber><![CDATA[R-100001]]></referencenumber>
+    <url><![CDATA[https://www.wellsfargojobs.com/en/jobs/r-100001/software-engineer/]]></url>
+    <city><![CDATA[CHARLOTTE]]></city>
+    <state><![CDATA[North Carolina]]></state>
+    <country><![CDATA[United States of America]]></country>
+    <postalcode><![CDATA[]]></postalcode>
+    <description><![CDATA[<p>About this role: build things.</p><ul><li>Python</li><li>AWS</li></ul>]]></description>
+    <jobtype><![CDATA[Full time]]></jobtype>
+    <category><![CDATA[Technology]]></category>
+    <sourcename><![CDATA[Wells Fargo]]></sourcename>
+    <remotetype><![CDATA[]]></remotetype>
+    <lastactivitydate><![CDATA[Thu, 21 May 2026 14:41:22 GMT]]></lastactivitydate>
+  </job>
+  <job>
+    <title><![CDATA[Mortgage Retail Sales Consultant]]></title>
+    <date><![CDATA[Fri, 22 May 2026 00:00:00 GMT]]></date>
+    <referencenumber><![CDATA[R-100002]]></referencenumber>
+    <url><![CDATA[https://www.wellsfargojobs.com/en/jobs/r-100002/mortgage-sales/]]></url>
+    <city><![CDATA[PHOENIX]]></city>
+    <state><![CDATA[Arizona]]></state>
+    <country><![CDATA[United States of America]]></country>
+    <postalcode><![CDATA[]]></postalcode>
+    <description><![CDATA[<p>Sell mortgages.</p>]]></description>
+    <jobtype><![CDATA[]]></jobtype>
+    <category><![CDATA[Client Management]]></category>
+    <sourcename><![CDATA[Wells Fargo]]></sourcename>
+    <remotetype><![CDATA[]]></remotetype>
+    <lastactivitydate><![CDATA[Fri, 22 May 2026 14:41:22 GMT]]></lastactivitydate>
+  </job>
+  <job>
+    <title><![CDATA[Customer Service Representative]]></title>
+    <date><![CDATA[Thu, 21 May 2026 00:00:00 GMT]]></date>
+    <referencenumber><![CDATA[R-200001]]></referencenumber>
+    <url><![CDATA[https://www.wellsfargojobs.com/en/jobs/r-200001/customer-service/]]></url>
+    <city><![CDATA[TAGUIG CITY]]></city>
+    <state><![CDATA[National Capital Region (Manila)]]></state>
+    <country><![CDATA[Philippines]]></country>
+    <postalcode><![CDATA[]]></postalcode>
+    <description><![CDATA[<p>Non-US role, must be filtered out.</p>]]></description>
+    <jobtype><![CDATA[Full time]]></jobtype>
+    <category><![CDATA[Administrative & Corporate Services]]></category>
+    <sourcename><![CDATA[Wells Fargo]]></sourcename>
+    <remotetype><![CDATA[]]></remotetype>
+    <lastactivitydate><![CDATA[Thu, 21 May 2026 14:41:22 GMT]]></lastactivitydate>
+  </job>
+  <job>
+    <title><![CDATA[Malformed Job Missing Reference]]></title>
+    <date><![CDATA[Thu, 21 May 2026 00:00:00 GMT]]></date>
+    <referencenumber><![CDATA[]]></referencenumber>
+    <url><![CDATA[https://www.wellsfargojobs.com/en/jobs/missing-ref/]]></url>
+    <city><![CDATA[DALLAS]]></city>
+    <state><![CDATA[Texas]]></state>
+    <country><![CDATA[United States of America]]></country>
+    <postalcode><![CDATA[]]></postalcode>
+    <description><![CDATA[<p>This job has no referencenumber and must be skipped.</p>]]></description>
+    <jobtype><![CDATA[Full time]]></jobtype>
+    <category><![CDATA[Operations]]></category>
+    <sourcename><![CDATA[Wells Fargo]]></sourcename>
+    <remotetype><![CDATA[]]></remotetype>
+    <lastactivitydate><![CDATA[Thu, 21 May 2026 14:41:22 GMT]]></lastactivitydate>
+  </job>
+  <job>
+    <title><![CDATA[Duplicate Software Engineer]]></title>
+    <date><![CDATA[Thu, 21 May 2026 00:00:00 GMT]]></date>
+    <referencenumber><![CDATA[R-100001]]></referencenumber>
+    <url><![CDATA[https://www.wellsfargojobs.com/en/jobs/r-100001/software-engineer/]]></url>
+    <city><![CDATA[CHARLOTTE]]></city>
+    <state><![CDATA[North Carolina]]></state>
+    <country><![CDATA[United States of America]]></country>
+    <postalcode><![CDATA[]]></postalcode>
+    <description><![CDATA[<p>Duplicate of R-100001, must be deduped.</p>]]></description>
+    <jobtype><![CDATA[Full time]]></jobtype>
+    <category><![CDATA[Technology]]></category>
+    <sourcename><![CDATA[Wells Fargo]]></sourcename>
+    <remotetype><![CDATA[]]></remotetype>
+    <lastactivitydate><![CDATA[Thu, 21 May 2026 14:41:22 GMT]]></lastactivitydate>
+  </job>
+  <job>
+    <title><![CDATA[Washington DC Compliance Analyst]]></title>
+    <date><![CDATA[Thu, 21 May 2026 00:00:00 GMT]]></date>
+    <referencenumber><![CDATA[R-300001]]></referencenumber>
+    <url><![CDATA[https://www.wellsfargojobs.com/en/jobs/r-300001/compliance-analyst/]]></url>
+    <city><![CDATA[WASHINGTON]]></city>
+    <state><![CDATA[District of Columbia]]></state>
+    <country><![CDATA[United States of America]]></country>
+    <postalcode><![CDATA[]]></postalcode>
+    <description><![CDATA[<p>Missing optional jobtype/remotetype fields.</p>]]></description>
+    <jobtype><![CDATA[]]></jobtype>
+    <category><![CDATA[]]></category>
+    <sourcename><![CDATA[Wells Fargo]]></sourcename>
+    <remotetype><![CDATA[]]></remotetype>
+    <lastactivitydate><![CDATA[Thu, 21 May 2026 14:41:22 GMT]]></lastactivitydate>
+  </job>
+</source>
