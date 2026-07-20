@@ -98,8 +98,6 @@ def scrape(
             f"unchanged={result.jobs_unchanged} failed={result.jobs_failed} "
             f"invalid={len(result.invalid_records)}"
         )
-    if company == "all":
-        typer.echo("goldman_sachs, bny: not yet wired (Milestone 4)")
 
 
 @app.command(name="temporal-worker")
