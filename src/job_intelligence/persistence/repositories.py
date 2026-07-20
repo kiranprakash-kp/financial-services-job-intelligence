@@ -100,6 +100,10 @@ class JobRepository:
         was_closed = not existing.is_active
 
         existing.title = normalized.title
+        existing.normalized_title = normalized.normalized_title
+        existing.role_family = normalized.role_family
+        existing.role_subfamily = normalized.role_subfamily
+        existing.classification_confidence = normalized.classification_confidence
         existing.employment_type = normalized.employment_type
         existing.business_unit = normalized.business_unit
         existing.location_text = primary.location_text if primary else existing.location_text
