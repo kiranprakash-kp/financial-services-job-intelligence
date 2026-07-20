@@ -8,7 +8,7 @@
 - [x] **M5** — Temporal workflows / activities / worker / schedule (tested against Temporal's real ephemeral test server)
 - [x] **M6** — lifecycle (grace-period closure), deterministic skills/role classification, analytics, summaries
 - [x] **M7** — Streamlit pages (all 7), synthetic demo history, CSV exports — driven end to end with Streamlit's AppTest harness + a real background server boot check, zero exceptions
-- [ ] **M8** — lint/type/test, README verification, limitations & roadmap
+- [x] **M8** — format/lint/type/test all green (86 tests: 83 offline + 3 opt-in live smoke); README verified against a fresh clone from scratch; limitations & roadmap finalized
 
 ## Documented Milestone 6 simplification
 `analytics/summaries.py`'s narrative covers current active-job composition

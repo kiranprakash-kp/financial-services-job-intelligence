@@ -120,6 +120,16 @@ RUN_LIVE_SCRAPER_TESTS=true uv run pytest -m live   # opt-in live smoke test
 ## 13. Troubleshooting
 - **`playwright` errors during recon** → run `uv run playwright install chromium`.
 - **Temporal connection refused** → ensure `docker compose up -d` is healthy.
+- **Workflow stuck, Temporal UI shows "No Workers Running"** → `job-intel
+  temporal-worker` isn't running (or was closed). Start it in its own
+  terminal — it must stay running to pick up work from the task queue.
+- **`sqlite3.OperationalError: database is locked`** → shouldn't happen as of
+  the WAL-mode + short-transaction fix (see `persistence/database.py` and
+  `app/services.py`); if you see it, check nothing else has `data/app.db` open
+  (a stray DB browser tool, etc.).
+- **Docker Desktop errors like `open //./pipe/dockerDesktopLinuxEngine`** →
+  Docker Desktop itself isn't running yet; start it and wait for the whale
+  icon to show "running" before retrying `docker compose up -d`.
 
 ## 14. Known limitations & 15. Compliance
 See [`docs/limitations.md`](docs/limitations.md). Career sites and public
@@ -128,8 +138,12 @@ filled; recruiting-priority scores are decision-support indicators, not
 predictions.
 
 ## 16. Roadmap (next steps)
-PostgreSQL backend · optional LLM skill/summary extractors · approved Bright Data
-proxy transport · broader company coverage.
+PostgreSQL backend for heavier write concurrency · optional LLM skill/summary
+extractors · approved Bright Data proxy transport · broader company coverage ·
+period-over-period growth folded into the narrative summaries · a reviewable
+role-classification evidence table (`role_taxonomy` is reserved for this,
+currently unused) · pinning BNY's exact Candidate Experience `siteNumber` and
+detail-URL pattern with production-grade certainty.
 
 ---
 Built milestone-by-milestone; see the milestone status in

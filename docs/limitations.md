@@ -22,6 +22,31 @@
   proven stable.
 - **Internal legal & information-security approval is required** before wider
   deployment.
+- **Role classification is rule-based keyword matching**, not a trained model.
+  Titles/descriptions that don't match any family fall back to "Other."
+  Matched evidence is returned by the classifier and logged, but not yet
+  persisted to its own reviewable column — a candidate follow-up, not a gap in
+  the underlying logic.
+- **BNY's job-detail URL is a constructed convention**, not an exhaustively
+  verified deep link (see `docs/site_reconnaissance/bny.md`) — the data itself
+  comes from the verified REST API either way.
+- **Monthly Comparison and trend views may include synthetic demo data**
+  (`data_source="synthetic"`, generated via `job-intel seed-demo`) when live
+  history is too short. The UI always labels which rows are 🟢 LIVE vs.
+  🟡 SYNTHETIC DEMO DATA, and synthetic rows never overwrite a live one for the
+  same company/month — but synthetic figures must never be presented as real
+  trends.
+- **Deterministic company narratives summarize current active-job composition**
+  (role families, skills, locations) — they do not yet incorporate
+  period-over-period growth into the sentence itself; that comparison is
+  available separately on the Monthly Comparison page.
+- **SQLite is single-writer.** WAL mode plus short, network-free transactions
+  (see `app/services.py`) handle this POC's concurrent 3-company fan-out
+  correctly, but a production deployment with heavier write concurrency should
+  move to PostgreSQL via `DATABASE_URL` — no code changes required.
+- **"Ask the Data" is a fixed, finite catalog** of pre-tested questions by
+  design, not a free-form query interface — this is a deliberate scope
+  boundary from the spec, not a temporary limitation.
 
 ## Compliance constraints
 This project operates **only on public job-listing information**. It does **not**

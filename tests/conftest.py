@@ -1,7 +1,8 @@
-"""Shared pytest fixtures."""
+"""Shared pytest fixtures and collection hooks."""
 
 from __future__ import annotations
 
+import os
 import tempfile
 from collections.abc import Iterator
 from pathlib import Path
@@ -13,6 +14,18 @@ from sqlalchemy.orm import sessionmaker
 from job_intelligence.config import get_settings
 from job_intelligence.persistence import database as db_module
 from job_intelligence.persistence.orm_models import Base
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
+    """Skip `live`-marked tests unless RUN_LIVE_SCRAPER_TESTS=true (spec-required
+    opt-in gate — these hit real career sites with conservative traffic).
+    """
+    if os.environ.get("RUN_LIVE_SCRAPER_TESTS", "").lower() == "true":
+        return
+    skip_live = pytest.mark.skip(reason="set RUN_LIVE_SCRAPER_TESTS=true to run live smoke tests")
+    for item in items:
+        if "live" in item.keywords:
+            item.add_marker(skip_live)
 
 
 @pytest.fixture

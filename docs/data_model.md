@@ -13,8 +13,8 @@ Alembic owns schema evolution (`migrations/`). See the ER diagram in
 | `job_snapshots` | Historical content snapshots | append-only; one per *meaningful* change (deduped by `content_hash`) |
 | `skills` | Canonical skill catalog | `category`, `aliases_json` |
 | `job_skills` | Job↔skill with evidence | `source`, `confidence`, `evidence_text` |
-| `role_taxonomy` | Role classification rules store | reviewable |
-| `monthly_company_metrics` | Materialized monthly aggregates | unique `(company_id, year_month)` |
+| `role_taxonomy` | Reserved for a future reviewable rules store | currently unused — classification rules live in `config/roles.yml` |
+| `monthly_company_metrics` | Materialized monthly aggregates | unique `(company_id, year_month)`; `data_source` (live/synthetic) — synthetic rows (`job-intel seed-demo`) never overwrite a live row for the same period |
 
 ## Canonical key
 Prefer the source's stable id (`key_source = source_id`). When absent, derive a
