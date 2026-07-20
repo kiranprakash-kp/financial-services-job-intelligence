@@ -58,14 +58,23 @@ with left:
 
 with right:
     st.subheader("Most in-demand skills")
-    skills: dict[str, int] = {}
+    technical_skills: dict[str, int] = {}
+    domain_skills: dict[str, int] = {}
     for c in companies:
-        for s in metrics.top_skills(c["code"], limit=10):
-            skills[s["skill"]] = skills.get(s["skill"], 0) + s["count"]
-    if skills:
-        ranked_skills = dict(sorted(skills.items(), key=lambda kv: kv[1], reverse=True)[:10])
-        st.bar_chart(ranked_skills)
-    else:
+        groups = metrics.top_skills_by_group(c["code"], limit=10)
+        for s in groups["technical"]:
+            technical_skills[s["skill"]] = technical_skills.get(s["skill"], 0) + s["count"]
+        for s in groups["domain"]:
+            domain_skills[s["skill"]] = domain_skills.get(s["skill"], 0) + s["count"]
+    if technical_skills:
+        st.caption("Technical skills (Python, AWS, SQL, ...)")
+        ranked = dict(sorted(technical_skills.items(), key=lambda kv: kv[1], reverse=True)[:8])
+        st.bar_chart(ranked)
+    if domain_skills:
+        st.caption("Domain and process areas (Payments, Risk Management, Agile, ...)")
+        ranked_domain = dict(sorted(domain_skills.items(), key=lambda kv: kv[1], reverse=True)[:8])
+        st.bar_chart(ranked_domain)
+    if not technical_skills and not domain_skills:
         st.info("No skill data yet.")
 
 st.subheader("Top US locations")

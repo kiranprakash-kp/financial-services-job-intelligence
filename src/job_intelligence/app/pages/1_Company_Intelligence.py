@@ -31,10 +31,15 @@ with col1:
 
 with col2:
     st.subheader("Top skills")
-    skills = metrics.top_skills(company_code, limit=10)
-    if skills:
-        st.bar_chart({s["skill"]: s["count"] for s in skills})
-    else:
+    skill_groups = metrics.top_skills_by_group(company_code, limit=8)
+    technical, domain = skill_groups["technical"], skill_groups["domain"]
+    if technical:
+        st.caption("Technical skills (Python, AWS, SQL, ...)")
+        st.bar_chart({s["skill"]: s["count"] for s in technical})
+    if domain:
+        st.caption("Domain and process areas (Payments, Risk Management, Agile, ...)")
+        st.bar_chart({s["skill"]: s["count"] for s in domain})
+    if not technical and not domain:
         st.info("No skill data yet for this company.")
 
 st.subheader("Top locations")

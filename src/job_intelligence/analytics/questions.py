@@ -26,11 +26,19 @@ def _top_skills_answer(company_code: str) -> str:
     company_name = next(
         (c["name"] for c in metrics.list_companies() if c["code"] == company_code), company_code
     )
-    skills = metrics.top_skills(company_code, limit=5)
-    if not skills:
+    groups = metrics.top_skills_by_group(company_code, limit=5)
+    technical, domain = groups["technical"], groups["domain"]
+    if not technical and not domain:
         return f"No skill data recorded yet for {company_name}."
-    names = ", ".join(f"{s['skill']} ({s['count']})" for s in skills)
-    return f"Top skills for {company_name}: {names}."
+
+    parts = [f"Top skills for {company_name}:"]
+    if technical:
+        names = ", ".join(f"{s['skill']} ({s['count']})" for s in technical)
+        parts.append(f"technical skills — {names}.")
+    if domain:
+        names = ", ".join(f"{s['skill']} ({s['count']})" for s in domain)
+        parts.append(f"domain and process areas — {names}.")
+    return " ".join(parts)
 
 
 def _top_role_families_answer(company_code: str) -> str:

@@ -88,6 +88,41 @@ def top_skills(company_code: str, limit: int = 10) -> list[dict]:
         return [{"skill": row.canonical_name, "count": row.cnt} for row in rows]
 
 
+# config/skills.yml categories that are hands-on technical skills, as opposed
+# to financial-domain knowledge or delivery/process areas -- see
+# processing/skills.py and config/skills.yml for the full taxonomy.
+_TECHNICAL_SKILL_CATEGORIES = {"Programming", "Data and AI", "Cloud and platform", "Databases"}
+
+
+def top_skills_by_group(company_code: str, limit: int = 5) -> dict[str, list[dict]]:
+    """Top skills split into "technical" (Python, AWS, SQL, ...) vs. "domain"
+    (Payments, Risk Management, Agile, ...) -- these are different *kinds* of
+    things and showing them as one flat "skills" list conflates them.
+    """
+    Session = get_sessionmaker()
+    with Session() as session:
+        company_id = _company_id(session, company_code)
+        if company_id is None:
+            return {"technical": [], "domain": []}
+        rows = session.execute(
+            select(
+                m.Skill.canonical_name, m.Skill.category, func.count(m.JobSkill.job_id).label("cnt")
+            )
+            .join(m.JobSkill, m.JobSkill.skill_id == m.Skill.id)
+            .join(m.Job, m.Job.id == m.JobSkill.job_id)
+            .where(m.Job.company_id == company_id, m.Job.is_active.is_(True))
+            .group_by(m.Skill.canonical_name, m.Skill.category)
+            .order_by(func.count(m.JobSkill.job_id).desc())
+        ).all()
+
+        buckets: dict[str, list[dict]] = {"technical": [], "domain": []}
+        for name, category, count in rows:
+            group = "technical" if category in _TECHNICAL_SKILL_CATEGORIES else "domain"
+            if len(buckets[group]) < limit:
+                buckets[group].append({"skill": name, "count": count})
+        return buckets
+
+
 def top_locations(company_code: str, limit: int = 5) -> list[dict]:
     Session = get_sessionmaker()
     with Session() as session:
