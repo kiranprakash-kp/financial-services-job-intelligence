@@ -1,14 +1,23 @@
-"""Ingestion service: the one entry point the CLI (and later Streamlit/Temporal
-Activities) call to run a company's adapter and persist results.
+"""Ingestion service: the one entry point the CLI, Temporal Activities, and
+(later) Streamlit all call to run a company's adapter and persist results.
 
-Pre-Temporal (Milestone 3/4), this runs the adapter in-process. From Milestone 5
-onward the same public function dispatches to a Temporal workflow instead — its
-signature and return shape do not change, so callers are unaffected.
+Split into two steps so Temporal can wrap each in its own Activity with its own
+retry/idempotency boundary:
+
+- `create_ingestion_run` — cheap, creates the company + run record, returns its id.
+- `run_company_ingestion` — the extraction/normalize/persist loop; always leaves
+  the run record in a terminal state (success/degraded/failed) before returning
+  or raising, so a run is never left stuck at "running" even if this call itself
+  ultimately fails after Temporal's retries are exhausted.
+
+This module has no Temporal import — it stays usable directly from the CLI
+(pre-Temporal manual runs) and from Temporal Activities alike.
 """
 
 from __future__ import annotations
 
 import uuid
+from collections.abc import Callable
 from datetime import datetime
 
 from ..config import get_settings, load_companies_config
@@ -48,48 +57,78 @@ _ADAPTER_BUILDERS["goldman_sachs"] = _build_goldman_sachs
 _ADAPTER_BUILDERS["bny"] = _build_bny
 
 
-async def run_company_ingestion(company_key: str, dev_job_limit: int | None) -> CompanyRunResult:
+def _require_adapter_builder(company_key: str):
+    builder = _ADAPTER_BUILDERS.get(company_key)
+    if builder is None:
+        raise ConfigurationError(
+            f"No adapter wired for {company_key!r} yet (available: {sorted(_ADAPTER_BUILDERS)})."
+        )
+    return builder
+
+
+def create_ingestion_run(company_key: str, workflow_id: str, trigger_type: str) -> int:
+    """Create the company (if new) and an ingestion_run row; return its id."""
+    cfg = load_companies_config().get(company_key)
+    with unit_of_work() as uow:
+        company_row = uow.companies.ensure(cfg.code, cfg.name, cfg.career_site_url)
+        run_row = m.IngestionRun(
+            workflow_id=workflow_id,
+            company_id=company_row.id,
+            trigger_type=trigger_type,
+            status="running",
+        )
+        uow.session.add(run_row)
+        uow.session.flush()
+        return run_row.id
+
+
+async def run_company_ingestion(
+    company_key: str,
+    dev_job_limit: int | None,
+    ingestion_run_id: int | None = None,
+    workflow_id: str | None = None,
+    on_progress: Callable[[int], None] | None = None,
+) -> CompanyRunResult:
     """Run one company's adapter end to end and persist normalized jobs.
 
     Idempotent: re-running never duplicates a job (unique company+source id),
     and a snapshot is only appended when the content hash actually changes.
-    """
-    builder = _ADAPTER_BUILDERS.get(company_key)
-    if builder is None:
-        raise ConfigurationError(
-            f"No adapter wired for {company_key!r} yet "
-            f"(available: {sorted(_ADAPTER_BUILDERS)})."
-        )
 
+    If `ingestion_run_id` is None, a run record is created here too (the CLI's
+    direct, pre-Temporal path). Either way, the run record always ends up in a
+    terminal status — success, degraded, or failed — before this returns or
+    the exception propagates.
+    """
+    builder = _require_adapter_builder(company_key)
     settings = get_settings()
     cfg = load_companies_config().get(company_key)
     transport_factory = TransportFactory(settings)
     adapter = builder(transport_factory)
 
+    owns_run_record = ingestion_run_id is None
+    run_id = ingestion_run_id or create_ingestion_run(
+        company_key, workflow_id or f"cli-adhoc-{uuid.uuid4().hex[:8]}", "manual"
+    )
+
     run_context = RunContext(
         company_code=CompanyCode(cfg.code),
-        workflow_id=f"cli-adhoc-{uuid.uuid4().hex[:8]}",
-        run_id=str(uuid.uuid4()),
-        triggered_by="cli",
+        workflow_id=workflow_id or f"cli-adhoc-{uuid.uuid4().hex[:8]}",
+        run_id=str(run_id),
+        triggered_by="cli" if owns_run_record else "temporal",
         dev_job_limit=dev_job_limit,
     )
     result = CompanyRunResult(company_code=CompanyCode(cfg.code), status="running")
     invalid: list[InvalidRecord] = []
+    error_summary: str | None = None
 
     try:
         with unit_of_work() as uow:
             company_row = uow.companies.ensure(cfg.code, cfg.name, cfg.career_site_url)
-            run_row = m.IngestionRun(
-                workflow_id=run_context.workflow_id,
-                company_id=company_row.id,
-                trigger_type=run_context.triggered_by,
-                status="running",
-            )
-            uow.session.add(run_row)
-            uow.session.flush()
 
             async for discovered in adapter.discover_jobs(run_context):
                 result.jobs_discovered += 1
+                if on_progress is not None:
+                    on_progress(result.jobs_discovered)
                 try:
                     raw = await adapter.fetch_job_detail(discovered, run_context)
                     normalized = adapter.normalize(raw)
@@ -117,7 +156,7 @@ async def run_company_ingestion(company_key: str, dev_job_limit: int | None) -> 
                     )
                     continue
 
-                _, change_type = uow.jobs.upsert(normalized, company_row, run_row.id)
+                _, change_type = uow.jobs.upsert(normalized, company_row, run_id)
                 if change_type == JobChangeType.NEW:
                     result.jobs_inserted += 1
                 elif change_type == JobChangeType.UNCHANGED:
@@ -128,18 +167,25 @@ async def run_company_ingestion(company_key: str, dev_job_limit: int | None) -> 
             result.complete_result_set = dev_job_limit is None
             result.status = "success"
             result.invalid_records = invalid
-
-            run_row.status = result.status
-            run_row.completed_at = datetime.utcnow()
-            run_row.pages_discovered = 1
-            run_row.jobs_discovered = result.jobs_discovered
-            run_row.jobs_fetched = result.jobs_fetched
-            run_row.jobs_inserted = result.jobs_inserted
-            run_row.jobs_updated = result.jobs_updated
-            run_row.jobs_unchanged = result.jobs_unchanged
-            run_row.jobs_failed = result.jobs_failed
+    except JobIntelError as exc:
+        result.status = "failed"
+        error_summary = str(exc)
+        raise
     finally:
         await adapter.aclose()
+        with unit_of_work() as uow:
+            run_row = uow.session.get(m.IngestionRun, run_id)
+            if run_row is not None:
+                run_row.status = result.status
+                run_row.completed_at = datetime.utcnow()
+                run_row.pages_discovered = 1 if result.jobs_discovered else 0
+                run_row.jobs_discovered = result.jobs_discovered
+                run_row.jobs_fetched = result.jobs_fetched
+                run_row.jobs_inserted = result.jobs_inserted
+                run_row.jobs_updated = result.jobs_updated
+                run_row.jobs_unchanged = result.jobs_unchanged
+                run_row.jobs_failed = result.jobs_failed
+                run_row.error_summary = error_summary
 
     log.info(
         "ingestion.company_run_complete",

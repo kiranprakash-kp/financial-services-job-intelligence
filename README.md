@@ -76,8 +76,26 @@ uv run job-intel recon --company goldman_sachs
 uv run job-intel recon --company bny
 ```
 
-## 8. Worker startup / 9. Manual ingestion / 10. Schedule
-> Arrive in Milestone 5 (Temporal). Commands are stubbed and fail loudly until then.
+## 8. Worker startup
+```bash
+uv run job-intel temporal-worker          # requires `docker compose up -d`
+```
+
+## 9. Manual ingestion (one-time, orchestrated)
+```bash
+uv run job-intel temporal-run --company all --limit 20
+uv run job-intel scrape --company wells_fargo --limit 20   # or: direct, no Temporal
+```
+
+## 10. Schedule (daily, overlap-safe)
+```bash
+uv run job-intel schedule-create                      # 06:00 UTC daily, overlap policy: SKIP
+uv run job-intel schedule-trigger                      # run it right now
+uv run job-intel schedule-inspect                      # paused state, recent/next runs
+uv run job-intel schedule-pause
+uv run job-intel schedule-unpause
+uv run job-intel schedule-delete
+```
 
 ## 11. Streamlit
 > Arrives in Milestone 7. `uv run job-intel app`.

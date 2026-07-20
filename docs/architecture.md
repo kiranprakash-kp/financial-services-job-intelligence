@@ -5,10 +5,29 @@
 - [x] **M2** — Playwright reconnaissance utility + three site reports (evidence-based)
 - [x] **M3** — Wells Fargo vertical slice (adapter → normalize → SQLite), proven idempotent via a live dev-sample run
 - [x] **M4** — Goldman Sachs + BNY adapters (offline respx-tested; both verified live via reconnaissance)
-- [ ] **M5** — Temporal workflows / activities / worker / schedule
+- [x] **M5** — Temporal workflows / activities / worker / schedule (tested against Temporal's real ephemeral test server)
 - [ ] **M6** — lifecycle, skills, role classification, analytics, summaries
 - [ ] **M7** — Streamlit pages, synthetic demo history, CSV exports
 - [ ] **M8** — lint/type/test, README verification, limitations & roadmap
+
+## Documented Milestone 5 simplification
+The spec enumerates up to 13 fine-grained Activities per company (discover
+pages, fetch details in bounded batches, normalize, classify, extract skills,
+etc.). This POC uses **two** Activities per company instead —
+`create_ingestion_run_activity` (cheap, idempotent) and
+`run_extraction_activity` (discover → fetch → normalize → validate → upsert →
+snapshot, heartbeating as jobs are discovered) — because the adapters
+themselves already batch discovery+detail efficiently (Wells Fargo's feed and
+Goldman Sachs' GraphQL page both return many jobs per request), so splitting
+further would only add activity-boundary overhead without a matching gain in
+retry granularity. All of the spec's underlying Temporal requirements are still
+met: per-activity timeouts, exponential-backoff retry policies, non-retryable
+exception classification (`domain/exceptions.py`'s Retryable/NonRetryable
+split, matched by class name), heartbeats, unique workflow IDs, idempotent
+Activities, and partial-company failure reporting (a company's failure is
+caught and returned as a `status="failed"` result rather than failing the
+whole run). Skills/role classification remain separate concerns, arriving in
+Milestone 6.
 
 ## Principles
 Adapters are source-specific; domain models are source-independent; workflows

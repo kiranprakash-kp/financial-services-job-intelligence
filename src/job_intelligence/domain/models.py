@@ -53,6 +53,30 @@ class RunContext(_Model):
     dev_page_limit: int | None = None
 
 
+class CompanyIngestionParams(_Model):
+    """Input to CompanyJobIngestionWorkflow — company_key is the config/companies.yml key.
+
+    Deliberately carries no CompanyCode/config lookups: workflow code must stay
+    deterministic, so `company_key.upper()` (wells_fargo -> WELLS_FARGO, etc.) is
+    used to derive the code wherever needed, rather than reading YAML config
+    inside a workflow.
+    """
+
+    company_key: str
+    triggered_by: str
+    trigger_type: TriggerType = TriggerType.MANUAL
+    dev_job_limit: int | None = None
+
+
+class ExtractionActivityParams(_Model):
+    """Input to the extraction Activity — the run record already exists."""
+
+    company_key: str
+    dev_job_limit: int | None
+    ingestion_run_id: int
+    workflow_id: str
+
+
 # --------------------------------------------------------------------------- #
 # Extraction plan (result of strategy resolution)
 # --------------------------------------------------------------------------- #
