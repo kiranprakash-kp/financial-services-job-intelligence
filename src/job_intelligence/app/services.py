@@ -31,7 +31,21 @@ def _build_wells_fargo(transport_factory: TransportFactory):
     return WellsFargoAdapter(transport_factory)
 
 
+def _build_goldman_sachs(transport_factory: TransportFactory):
+    from ..adapters.goldman_sachs import GoldmanSachsAdapter
+
+    return GoldmanSachsAdapter(transport_factory)
+
+
+def _build_bny(transport_factory: TransportFactory):
+    from ..adapters.bny import BNYAdapter
+
+    return BNYAdapter(transport_factory)
+
+
 _ADAPTER_BUILDERS["wells_fargo"] = _build_wells_fargo
+_ADAPTER_BUILDERS["goldman_sachs"] = _build_goldman_sachs
+_ADAPTER_BUILDERS["bny"] = _build_bny
 
 
 async def run_company_ingestion(company_key: str, dev_job_limit: int | None) -> CompanyRunResult:

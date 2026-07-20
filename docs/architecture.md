@@ -3,8 +3,8 @@
 ## Milestone status
 - [x] **M1** — repo, config, logging, DB schema + Alembic, domain models, Docker Temporal, README skeleton
 - [x] **M2** — Playwright reconnaissance utility + three site reports (evidence-based)
-- [ ] **M3** — first vertical slice (Wells Fargo → Temporal → SQLite → analytics → one Streamlit page)
-- [ ] **M4** — BNY + Goldman Sachs adapters
+- [x] **M3** — Wells Fargo vertical slice (adapter → normalize → SQLite), proven idempotent via a live dev-sample run
+- [x] **M4** — Goldman Sachs + BNY adapters (offline respx-tested; both verified live via reconnaissance)
 - [ ] **M5** — Temporal workflows / activities / worker / schedule
 - [ ] **M6** — lifecycle, skills, role classification, analytics, summaries
 - [ ] **M7** — Streamlit pages, synthetic demo history, CSV exports

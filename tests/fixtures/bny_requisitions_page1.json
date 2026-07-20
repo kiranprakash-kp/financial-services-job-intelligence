@@ -1,0 +1,45 @@
+{
+  "items": [
+    {
+      "TotalJobsCount": 3,
+      "requisitionList": [
+        {
+          "Id": "900001",
+          "Title": "Associate, Client Processing",
+          "PostedDate": "2026-07-20",
+          "PrimaryLocationCountry": "US",
+          "PrimaryLocation": "Lake Mary, FL, United States",
+          "JobSchedule": "Full time",
+          "WorkplaceType": "",
+          "BusinessUnit": null,
+          "Department": null,
+          "secondaryLocations": []
+        },
+        {
+          "Id": "900002",
+          "Title": "Analyst, Global Markets",
+          "PostedDate": "2026-07-19",
+          "PrimaryLocationCountry": "IN",
+          "PrimaryLocation": "Pune, Maharashtra, India",
+          "JobSchedule": "Full time",
+          "WorkplaceType": "",
+          "BusinessUnit": null,
+          "Department": null,
+          "secondaryLocations": []
+        },
+        {
+          "Id": "900003",
+          "Title": "Senior Software Engineer",
+          "PostedDate": "2026-07-18",
+          "PrimaryLocationCountry": "US",
+          "PrimaryLocation": "Pittsburgh, PA, United States",
+          "JobSchedule": "Full time",
+          "WorkplaceType": "Hybrid",
+          "BusinessUnit": "Technology",
+          "Department": "Engineering",
+          "secondaryLocations": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "data": {
+    "roleSearch": {
+      "totalCount": 2,
+      "items": [
+        {
+          "roleId": "100001_GS_MID_CAREER",
+          "corporateTitle": "Analyst",
+          "jobTitle": "Software Engineer, New York",
+          "jobFunction": "Engineering",
+          "locations": [
+            { "primary": true, "state": "NY", "country": "United States", "city": "New York" }
+          ],
+          "status": "POSTED",
+          "division": "Engineering",
+          "skills": ["Python", "AWS"],
+          "jobType": { "code": "FT", "description": "Full time" },
+          "externalSource": { "sourceId": "100001" }
+        },
+        {
+          "roleId": "100002_GS_MID_CAREER",
+          "corporateTitle": "Associate",
+          "jobTitle": "Risk Analyst, London",
+          "jobFunction": "Risk",
+          "locations": [
+            { "primary": true, "state": null, "country": "United Kingdom", "city": "London" }
+          ],
+          "status": "POSTED",
+          "division": "Risk",
+          "skills": ["Risk Management"],
+          "jobType": { "code": "FT", "description": "Full time" },
+          "externalSource": { "sourceId": "100002" }
+        },
+        {
+          "roleId": "100001_GS_MID_CAREER",
+          "corporateTitle": "Analyst",
+          "jobTitle": "Duplicate Software Engineer",
+          "jobFunction": "Engineering",
+          "locations": [
+            { "primary": true, "state": "NY", "country": "United States", "city": "New York" }
+          ],
+          "status": "POSTED",
+          "division": "Engineering",
+          "skills": ["Python"],
+          "jobType": { "code": "FT", "description": "Full time" },
+          "externalSource": { "sourceId": "100001" }
+        }
+      ]
+    }
+  }
+}

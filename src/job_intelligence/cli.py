@@ -71,31 +71,33 @@ def _not_yet(milestone: str) -> None:
     )
 
 
+_WIRED_COMPANIES = ("wells_fargo", "goldman_sachs", "bny")
+
+
 @app.command()
 def scrape(
     company: str = typer.Option("all", help="Company key or 'all'"),
     limit: int = typer.Option(20, help="Dev job limit per company (0 = no limit)"),
 ) -> None:
-    """Run extraction directly (no Temporal yet — arrives in Milestone 5).
-
-    Only Wells Fargo is wired so far (Milestone 3). Goldman Sachs / BNY arrive
-    in Milestone 4.
-    """
+    """Run extraction directly (no Temporal yet — arrives in Milestone 5)."""
     configure_logging()
     from .app.services import run_company_ingestion
 
-    if company not in ("all", "wells_fargo"):
-        _not_yet("Milestone 4 (Goldman Sachs / BNY adapters)")
-        return
+    if company not in ("all", *_WIRED_COMPANIES):
+        typer.echo(f"Unknown company: {company!r} (known: {_WIRED_COMPANIES})", err=True)
+        raise typer.Exit(1)
 
     dev_job_limit = None if limit == 0 else limit
-    result = asyncio.run(run_company_ingestion("wells_fargo", dev_job_limit))
-    typer.echo(
-        f"wells_fargo: discovered={result.jobs_discovered} fetched={result.jobs_fetched} "
-        f"inserted={result.jobs_inserted} updated={result.jobs_updated} "
-        f"unchanged={result.jobs_unchanged} failed={result.jobs_failed} "
-        f"invalid={len(result.invalid_records)}"
-    )
+    targets = _WIRED_COMPANIES if company == "all" else (company,)
+
+    for key in targets:
+        result = asyncio.run(run_company_ingestion(key, dev_job_limit))
+        typer.echo(
+            f"{key}: discovered={result.jobs_discovered} fetched={result.jobs_fetched} "
+            f"inserted={result.jobs_inserted} updated={result.jobs_updated} "
+            f"unchanged={result.jobs_unchanged} failed={result.jobs_failed} "
+            f"invalid={len(result.invalid_records)}"
+        )
     if company == "all":
         typer.echo("goldman_sachs, bny: not yet wired (Milestone 4)")
 
