@@ -1,0 +1,62 @@
+# Versioned adapter configuration, derived from verified reconnaissance
+# (docs/site_reconnaissance/*.md). Do NOT run live recon on every scheduled
+# run — re-run recon only when parsing/counts drift (see limitations.md).
+#
+# extraction_strategy: auto | direct_api | server_html | browser_api | browser_dom
+# proxy_enabled: per-company opt-in; false for the whole POC.
+
+recon_version: "2026-07-20"
+
+companies:
+  wells_fargo:
+    code: WELLS_FARGO
+    name: Wells Fargo
+    active: true
+    career_site_url: "https://www.wellsfargojobs.com/en/jobs/?search=&country=United+States+of+America&pagesize=20#results"
+    extraction_strategy: server_html
+    proxy_enabled: false
+    allowed_domains:
+      - www.wellsfargojobs.com
+    settings:
+      # Full job-board XML export (all postings, stable R-###### ids). Used for
+      # discovery; detail is read from the server-rendered posting page.
+      feed_url: "https://www.wellsfargojobs.com/en/jobs/xml/"
+      listing_url_template: "https://www.wellsfargojobs.com/en/jobs/?country=United+States+of+America&pagesize=20&pg={page}"
+      detail_is_server_rendered: true
+
+  goldman_sachs:
+    code: GOLDMAN_SACHS
+    name: Goldman Sachs
+    active: true
+    career_site_url: "https://higher.gs.com/results?sort=RELEVANCE"
+    extraction_strategy: direct_api
+    proxy_enabled: false
+    allowed_domains:
+      - higher.gs.com
+      - api-higher.gs.com
+    settings:
+      # Public Apollo/GraphQL gateway used by the higher.gs.com SPA.
+      graphql_url: "https://api-higher.gs.com/gateway/api/v1/graphql"
+      operation_name: GetRoles
+      experiences: ["EARLY_CAREER", "PROFESSIONAL"]
+      page_size: 20            # pageNumber is 0-indexed on this API
+      apollo_client_name: "higher-web-poc"
+
+  bny:
+    code: BNY
+    name: BNY
+    active: true
+    career_site_url: "https://eofe.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/BNY-Careers/jobs"
+    extraction_strategy: direct_api
+    proxy_enabled: false
+    allowed_domains:
+      - eofe.fa.us2.oraclecloud.com
+    settings:
+      # Oracle Recruiting (Candidate Experience) public REST resource.
+      api_base: "https://eofe.fa.us2.oraclecloud.com/hcmRestApi/resources/latest"
+      requisitions_resource: recruitingCEJobRequisitions
+      detail_resource: recruitingCEJobRequisitionDetails
+      # Provisional — confirm the exact site number during the recon step.
+      site_number: "CX_1001"
+      us_location_facet: "300000000378743"
+      page_size: 25            # limit/offset pagination

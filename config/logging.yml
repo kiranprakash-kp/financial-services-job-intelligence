@@ -1,0 +1,16 @@
+# Structured logging configuration (consumed by job_intelligence/logging.py).
+level: INFO
+# "json" for machine-readable logs (production-like), "console" for local dev.
+renderer: console
+# Fields always bound onto the structured logger when present in context.
+bound_fields:
+  - workflow_id
+  - run_id
+  - company
+  - activity
+  - page_number
+  - source_job_id
+# Never emit full descriptions by default (privacy + log volume).
+redact_fields:
+  - description_text
+  - raw_payload_json

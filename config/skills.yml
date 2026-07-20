@@ -1,0 +1,82 @@
+# Deterministic skill taxonomy. Matching is phrase-boundary aware (see
+# processing/skills.py) — aliases are matched as whole tokens/phrases to avoid
+# false positives (e.g. "Go" the language must not match the word "going").
+#
+# canonical: category, optional aliases, and optional `word_boundary` hints for
+# short/ambiguous names that require stricter matching.
+
+Programming:
+  Python: {}
+  Java: { aliases: ["Core Java"] }
+  "C#": { aliases: ["CSharp", "C-Sharp", ".NET C#"] }
+  "C++": { aliases: ["CPP"] }
+  JavaScript: { aliases: ["JS", "ECMAScript"] }
+  TypeScript: { aliases: ["TS"] }
+  Scala: {}
+  Go: { aliases: ["Golang"], require_exact: true }
+  SQL: {}
+  Shell: { aliases: ["Bash", "Shell scripting"] }
+
+Data and AI:
+  Machine Learning: { aliases: ["ML"] }
+  Generative AI: { aliases: ["GenAI", "Gen AI"] }
+  LLM: { aliases: ["Large Language Models", "Large Language Model"] }
+  NLP: { aliases: ["Natural Language Processing"] }
+  RAG: { aliases: ["Retrieval Augmented Generation", "Retrieval-Augmented Generation"] }
+  Data Science: {}
+  Pandas: {}
+  Spark: { aliases: ["Apache Spark", "PySpark"] }
+  Databricks: {}
+  Snowflake: {}
+  Kafka: { aliases: ["Apache Kafka"] }
+  Airflow: { aliases: ["Apache Airflow"] }
+  TensorFlow: {}
+  PyTorch: {}
+  MLOps: {}
+
+Cloud and platform:
+  AWS: { aliases: ["Amazon Web Services"] }
+  Azure: { aliases: ["Microsoft Azure"] }
+  GCP: { aliases: ["Google Cloud Platform", "Google Cloud"] }
+  Docker: {}
+  Kubernetes: { aliases: ["K8s"] }
+  Terraform: {}
+  OpenShift: {}
+  Linux: {}
+  CI/CD: { aliases: ["CICD", "Continuous Integration", "Continuous Delivery"] }
+
+Databases:
+  Oracle: {}
+  PostgreSQL: { aliases: ["Postgres"] }
+  SQL Server: { aliases: ["MSSQL", "Microsoft SQL Server"] }
+  MySQL: {}
+  MongoDB: { aliases: ["Mongo"] }
+  Redis: {}
+  Cassandra: {}
+
+Financial-services domain:
+  Risk Management: {}
+  Market Risk: {}
+  Credit Risk: {}
+  Model Risk: {}
+  Operational Risk: {}
+  Regulatory Reporting: {}
+  AML: { aliases: ["Anti-Money Laundering", "Anti Money Laundering"] }
+  KYC: { aliases: ["Know Your Customer"] }
+  Fraud: {}
+  Payments: {}
+  Treasury: {}
+  Securities: {}
+  Asset Management: {}
+  Wealth Management: {}
+  Investment Banking: {}
+  Capital Markets: {}
+  Trade Surveillance: {}
+
+Enterprise and delivery:
+  Agile: {}
+  Scrum: {}
+  Product Management: {}
+  Business Analysis: {}
+  Project Management: {}
+  Stakeholder Management: {}

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Environment / secrets
+.env
+*.env
+!.env.example
+
+# Local data — never commit collected data, debug payloads, or browser profiles
+data/*.db
+data/*.sqlite3
+data/exports/*
+data/debug/*
+!data/exports/.gitkeep
+!data/debug/.gitkeep
+browser_profiles/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

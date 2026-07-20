@@ -1,0 +1,64 @@
+# Explainable, rule-based role classification (processing/role_classifier.py).
+# Title keywords are weighted higher than description keywords. First matching
+# family by weighted evidence wins; ties fall through in listed order.
+# Each family may declare subfamilies with their own keywords.
+
+families:
+  - role_family: Software Engineering
+    keywords: ["software engineer", "developer", "programmer", "full stack", "backend", "front end", "frontend", "sde", "application engineer"]
+    subfamilies:
+      Backend: ["backend", "api", "microservice", "java", "python", "golang"]
+      Frontend: ["frontend", "front end", "react", "angular", "ui engineer"]
+      Full Stack: ["full stack", "fullstack"]
+
+  - role_family: Data and AI
+    keywords: ["data scientist", "data engineer", "machine learning", "ml engineer", "ai engineer", "analytics engineer", "data analyst", "generative ai", "nlp"]
+    subfamilies:
+      Data Engineering: ["data engineer", "etl", "pipeline", "spark", "databricks"]
+      Data Science: ["data scientist", "machine learning", "statistical", "modeling"]
+      AI Engineering: ["ai engineer", "generative ai", "llm", "nlp"]
+
+  - role_family: Cloud and Infrastructure
+    keywords: ["cloud engineer", "devops", "site reliability", "sre", "platform engineer", "infrastructure", "kubernetes", "systems engineer"]
+
+  - role_family: Cybersecurity
+    keywords: ["security engineer", "cybersecurity", "information security", "infosec", "security analyst", "penetration", "soc analyst", "threat"]
+
+  - role_family: Risk and Compliance
+    keywords: ["risk", "compliance", "regulatory", "aml", "kyc", "financial crime", "controls", "surveillance"]
+    subfamilies:
+      Market Risk: ["market risk"]
+      Credit Risk: ["credit risk"]
+      Model Risk: ["model risk"]
+      Financial Crime: ["aml", "kyc", "financial crime", "fraud"]
+
+  - role_family: Finance and Accounting
+    keywords: ["accountant", "accounting", "financial analyst", "controller", "fp&a", "treasury", "tax"]
+
+  - role_family: Operations
+    keywords: ["operations", "processing", "settlements", "reconciliation", "back office", "middle office", "servicing"]
+
+  - role_family: Product Management
+    keywords: ["product manager", "product owner", "product lead"]
+
+  - role_family: Project and Program Management
+    keywords: ["project manager", "program manager", "scrum master", "delivery manager", "pmo"]
+
+  - role_family: Business Analysis
+    keywords: ["business analyst", "business analysis", "requirements analyst", "systems analyst"]
+
+  - role_family: Sales and Relationship Management
+    keywords: ["sales", "relationship manager", "account executive", "client advisor", "banker", "business development"]
+
+  - role_family: Human Resources
+    keywords: ["human resources", "recruiter", "talent acquisition", "hr business partner", "people team"]
+
+  - role_family: Legal
+    keywords: ["legal", "counsel", "attorney", "paralegal"]
+
+  - role_family: Audit
+    keywords: ["audit", "auditor", "internal audit"]
+
+  # Fallback family; never remove.
+  - role_family: Other
+    keywords: []
