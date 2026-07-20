@@ -60,6 +60,17 @@ class CompanyJobIngestionWorkflow:
             retry_policy=RetryPolicy(maximum_attempts=3),
         )
 
+        # A full run (dev_job_limit=None) fetches one detail request per job at
+        # our deliberately conservative ~1 req/sec/domain rate limit -- for
+        # Goldman Sachs (~1,250 jobs) or BNY (~1,700 jobs) that's 20-30+
+        # minutes, all inside a single activity attempt (heartbeats prove the
+        # worker is alive, but do not extend start_to_close_timeout). A dev/
+        # limited run (e.g. --limit 20) finishes in seconds either way.
+        is_full_run = params.dev_job_limit is None
+        start_to_close = timedelta(minutes=90) if is_full_run else timedelta(minutes=10)
+        schedule_to_close = timedelta(minutes=120) if is_full_run else timedelta(minutes=20)
+        max_attempts = 2 if is_full_run else 4  # avoid hours of wasted re-crawls on real failures
+
         try:
             return await workflow.execute_activity(
                 activities.run_extraction_activity,
@@ -69,14 +80,14 @@ class CompanyJobIngestionWorkflow:
                     ingestion_run_id=run_id,
                     workflow_id=info.workflow_id,
                 ),
-                start_to_close_timeout=timedelta(minutes=10),
-                schedule_to_close_timeout=timedelta(minutes=20),
+                start_to_close_timeout=start_to_close,
+                schedule_to_close_timeout=schedule_to_close,
                 heartbeat_timeout=timedelta(seconds=30),
                 retry_policy=RetryPolicy(
                     initial_interval=timedelta(seconds=2),
                     backoff_coefficient=2.0,
                     maximum_interval=timedelta(seconds=30),
-                    maximum_attempts=4,
+                    maximum_attempts=max_attempts,
                     non_retryable_error_types=_NON_RETRYABLE_ERROR_TYPES,
                 ),
             )
