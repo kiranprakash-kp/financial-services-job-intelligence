@@ -207,6 +207,16 @@ async def run_company_ingestion(
         result.status = "failed"
         error_summary = str(exc)
         raise
+    except BaseException as exc:
+        # Catches asyncio.CancelledError (e.g. Temporal forcibly cancelling
+        # this activity on a timeout) and anything else unexpected.
+        # CancelledError subclasses BaseException, not Exception, so it would
+        # otherwise skip the JobIntelError handler above and leave the run
+        # record stuck at "running" forever, even though it's truly over.
+        # Always re-raised immediately after — never swallowed.
+        result.status = "failed"
+        error_summary = f"{type(exc).__name__}: {exc}"
+        raise
     finally:
         await adapter.aclose()
         with unit_of_work() as uow:
