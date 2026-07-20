@@ -78,16 +78,16 @@ QUESTIONS: list[Question] = [
         _top_role_families_answer,
     ),
     Question(
-        "new_jobs_this_month", "What jobs were newly opened for {company} this month?",
+        "new_jobs_this_month",
+        "What jobs were newly opened for {company} this month?",
         _new_jobs_this_month_answer,
     ),
     Question(
-        "recruiting_focus", "What recruiting areas should be reviewed for {company}?",
+        "recruiting_focus",
+        "What recruiting areas should be reviewed for {company}?",
         _recruiting_focus_answer,
     ),
-    Question(
-        "common_skills", "Which skills occur across all companies?", _common_skills_answer
-    ),
+    Question("common_skills", "Which skills occur across all companies?", _common_skills_answer),
 ]
 
 

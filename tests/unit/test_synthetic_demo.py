@@ -36,9 +36,7 @@ def test_never_overwrites_a_live_month(isolated_db) -> None:
 
     with Session() as session:
         row = session.scalar(
-            select(m.MonthlyCompanyMetrics).where(
-                m.MonthlyCompanyMetrics.year_month == "2026-07"
-            )
+            select(m.MonthlyCompanyMetrics).where(m.MonthlyCompanyMetrics.year_month == "2026-07")
         )
         assert row is not None
         assert row.data_source == "live"

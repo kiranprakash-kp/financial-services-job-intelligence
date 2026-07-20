@@ -67,9 +67,7 @@ def companies() -> None:
 
 
 def _not_yet(milestone: str) -> None:
-    raise typer.Exit(
-        typer.echo(f"Not implemented yet — arrives in {milestone}.", err=True) or 1
-    )
+    raise typer.Exit(typer.echo(f"Not implemented yet — arrives in {milestone}.", err=True) or 1)
 
 
 _WIRED_COMPANIES = ("wells_fargo", "goldman_sachs", "bny")

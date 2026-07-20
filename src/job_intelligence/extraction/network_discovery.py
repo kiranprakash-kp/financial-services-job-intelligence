@@ -19,9 +19,24 @@ log = get_logger("recon")
 
 # Field names that suggest a response carries job records.
 _JOB_SIGNAL_KEYS = {
-    "job", "jobs", "requisition", "requisitions", "posting", "postings",
-    "position", "positions", "title", "location", "description", "jobid",
-    "requisitionid", "totalcount", "results", "items", "roles", "rolesearch",
+    "job",
+    "jobs",
+    "requisition",
+    "requisitions",
+    "posting",
+    "postings",
+    "position",
+    "positions",
+    "title",
+    "location",
+    "description",
+    "jobid",
+    "requisitionid",
+    "totalcount",
+    "results",
+    "items",
+    "roles",
+    "rolesearch",
     "recruitingcejobrequisitions",
 }
 _RESOURCE_TYPES = {"xhr", "fetch", "document"}

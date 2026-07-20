@@ -36,7 +36,7 @@ if results:
     st.dataframe(
         df,
         column_config={"posting_url": st.column_config.LinkColumn("Source link")},
-        width='stretch',
+        width="stretch",
     )
 else:
     st.info("No jobs match these filters.")

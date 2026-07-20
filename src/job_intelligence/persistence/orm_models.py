@@ -198,9 +198,7 @@ class RoleTaxonomy(Base):
 
 class MonthlyCompanyMetrics(Base):
     __tablename__ = "monthly_company_metrics"
-    __table_args__ = (
-        UniqueConstraint("company_id", "year_month", name="uq_company_month"),
-    )
+    __table_args__ = (UniqueConstraint("company_id", "year_month", name="uq_company_month"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"), index=True)

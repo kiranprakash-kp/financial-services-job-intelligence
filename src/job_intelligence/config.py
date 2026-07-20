@@ -23,9 +23,7 @@ CONFIG_DIR = PROJECT_ROOT / "config"
 class Settings(BaseSettings):
     """Environment-driven runtime settings."""
 
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     database_url: str = "sqlite:///data/app.db"
 
@@ -41,9 +39,7 @@ class Settings(BaseSettings):
     scrape_request_timeout_seconds: float = 30.0
     scrape_max_retries: int = 3
     scrape_domain_concurrency: int = 2
-    scrape_user_agent: str = (
-        "Capgemini-FS-JobIntel-POC/0.1 (internal research)"
-    )
+    scrape_user_agent: str = "Capgemini-FS-JobIntel-POC/0.1 (internal research)"
     # Safety cap so a runaway paginator can never loop forever.
     scrape_max_pages: int = 500
     scrape_page_delay_seconds: float = 1.0

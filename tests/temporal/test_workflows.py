@@ -40,10 +40,11 @@ _WORKFLOWS = [JobIntelligenceIngestionWorkflow, CompanyJobIngestionWorkflow]
 async def test_company_workflow_success(isolated_db) -> None:
     respx.get(FEED_URL).mock(return_value=httpx.Response(200, text=FIXTURE))
 
-    async with await WorkflowEnvironment.start_time_skipping(
-        data_converter=pydantic_data_converter
-    ) as env, Worker(
-        env.client, task_queue=TASK_QUEUE, workflows=_WORKFLOWS, activities=_ACTIVITIES
+    async with (
+        await WorkflowEnvironment.start_time_skipping(
+            data_converter=pydantic_data_converter
+        ) as env,
+        Worker(env.client, task_queue=TASK_QUEUE, workflows=_WORKFLOWS, activities=_ACTIVITIES),
     ):
         result = await env.client.execute_workflow(
             CompanyJobIngestionWorkflow.run,
@@ -67,10 +68,11 @@ async def test_company_workflow_non_retryable_failure_does_not_raise(isolated_db
     # 403 -> AccessDeniedError, a non-retryable type per the workflow's RetryPolicy.
     respx.get(FEED_URL).mock(return_value=httpx.Response(403))
 
-    async with await WorkflowEnvironment.start_time_skipping(
-        data_converter=pydantic_data_converter
-    ) as env, Worker(
-        env.client, task_queue=TASK_QUEUE, workflows=_WORKFLOWS, activities=_ACTIVITIES
+    async with (
+        await WorkflowEnvironment.start_time_skipping(
+            data_converter=pydantic_data_converter
+        ) as env,
+        Worker(env.client, task_queue=TASK_QUEUE, workflows=_WORKFLOWS, activities=_ACTIVITIES),
     ):
         result = await env.client.execute_workflow(
             CompanyJobIngestionWorkflow.run,
@@ -90,10 +92,11 @@ async def test_company_workflow_non_retryable_failure_does_not_raise(isolated_db
 async def test_parent_workflow_fans_out_and_reports_partial_failure(isolated_db) -> None:
     respx.get(FEED_URL).mock(return_value=httpx.Response(200, text=FIXTURE))
 
-    async with await WorkflowEnvironment.start_time_skipping(
-        data_converter=pydantic_data_converter
-    ) as env, Worker(
-        env.client, task_queue=TASK_QUEUE, workflows=_WORKFLOWS, activities=_ACTIVITIES
+    async with (
+        await WorkflowEnvironment.start_time_skipping(
+            data_converter=pydantic_data_converter
+        ) as env,
+        Worker(env.client, task_queue=TASK_QUEUE, workflows=_WORKFLOWS, activities=_ACTIVITIES),
     ):
         results = await env.client.execute_workflow(
             JobIntelligenceIngestionWorkflow.run,

@@ -34,7 +34,7 @@ st.divider()
 st.subheader("Recent ingestion runs")
 runs = metrics.recent_ingestion_runs(limit=30)
 if runs:
-    st.dataframe(pd.DataFrame(runs), width='stretch')
+    st.dataframe(pd.DataFrame(runs), width="stretch")
 else:
     st.info("No ingestion runs recorded yet.")
 

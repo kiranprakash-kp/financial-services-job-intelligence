@@ -202,9 +202,7 @@ async def run_company_ingestion(
             if lifecycle.is_degraded(result.jobs_discovered, previous_count):
                 result.status = "degraded"
             else:
-                result.jobs_closed = lifecycle.reconcile_closures(
-                    company_id, seen_source_job_ids
-                )
+                result.jobs_closed = lifecycle.reconcile_closures(company_id, seen_source_job_ids)
     except JobIntelError as exc:
         result.status = "failed"
         error_summary = str(exc)

@@ -14,10 +14,10 @@ class CompanyCode(str, Enum):
 class ExtractionMethod(str, Enum):
     """How an adapter obtains listings/details. Chosen from verified recon."""
 
-    DIRECT_API = "direct_api"        # public JSON/GraphQL via httpx
-    SERVER_HTML = "server_html"      # server-rendered HTML via httpx
-    BROWSER_API = "browser_api"      # Playwright captures a public API response
-    BROWSER_DOM = "browser_dom"      # Playwright DOM extraction (last resort)
+    DIRECT_API = "direct_api"  # public JSON/GraphQL via httpx
+    SERVER_HTML = "server_html"  # server-rendered HTML via httpx
+    BROWSER_API = "browser_api"  # Playwright captures a public API response
+    BROWSER_DOM = "browser_dom"  # Playwright DOM extraction (last resort)
 
 
 class TransportKind(str, Enum):
@@ -36,9 +36,9 @@ class TriggerType(str, Enum):
 class RunStatus(str, Enum):
     RUNNING = "running"
     SUCCESS = "success"
-    DEGRADED = "degraded"       # completed but failed data-quality thresholds
+    DEGRADED = "degraded"  # completed but failed data-quality thresholds
     FAILED = "failed"
-    PARTIAL = "partial"         # some companies succeeded, others failed
+    PARTIAL = "partial"  # some companies succeeded, others failed
 
 
 class JobChangeType(str, Enum):
@@ -59,8 +59,8 @@ class WorkplaceType(str, Enum):
 class KeySource(str, Enum):
     """Records how a job's canonical key was produced (for auditability)."""
 
-    SOURCE_ID = "source_id"          # stable id supplied by the source
-    DERIVED = "derived"              # hashed from normalized fields (fallback)
+    SOURCE_ID = "source_id"  # stable id supplied by the source
+    DERIVED = "derived"  # hashed from normalized fields (fallback)
 
 
 class DataSource(str, Enum):

@@ -21,7 +21,7 @@ if by_company:
     pivot = pd.DataFrame(rows).pivot_table(
         index="skill", columns="company", values="count", fill_value=0
     )
-    st.dataframe(pivot, width='stretch')
+    st.dataframe(pivot, width="stretch")
 else:
     st.info("No skill data recorded yet.")
 

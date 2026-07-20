@@ -24,7 +24,7 @@ _Session: sessionmaker[Session] | None = None
 def _ensure_sqlite_dir(url: str) -> None:
     prefix = "sqlite:///"
     if url.startswith(prefix):
-        db_path = Path(url[len(prefix):])
+        db_path = Path(url[len(prefix) :])
         if not db_path.is_absolute():
             db_path = get_settings().project_root / db_path
         db_path.parent.mkdir(parents=True, exist_ok=True)

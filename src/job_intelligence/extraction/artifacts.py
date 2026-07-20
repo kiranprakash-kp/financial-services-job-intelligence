@@ -31,10 +31,7 @@ _SENSITIVE_QUERY = {"token", "access_token", "sig", "signature", "sessionid", "_
 
 
 def sanitize_headers(headers: dict[str, str]) -> dict[str, str]:
-    return {
-        k: ("<redacted>" if k.lower() in _SENSITIVE_HEADERS else v)
-        for k, v in headers.items()
-    }
+    return {k: ("<redacted>" if k.lower() in _SENSITIVE_HEADERS else v) for k, v in headers.items()}
 
 
 def sanitize_url(url: str) -> str:

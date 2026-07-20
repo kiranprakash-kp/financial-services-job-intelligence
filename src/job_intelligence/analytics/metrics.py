@@ -200,9 +200,7 @@ def search_jobs(
 ) -> list[dict]:
     Session = get_sessionmaker()
     with Session() as session:
-        query = select(m.Job, m.Company.code).join(
-            m.Company, m.Company.id == m.Job.company_id
-        )
+        query = select(m.Job, m.Company.code).join(m.Company, m.Company.id == m.Job.company_id)
         if company_code is not None:
             query = query.where(m.Company.code == company_code)
         if active is not None:
@@ -219,9 +217,11 @@ def search_jobs(
             like = f"%{keyword}%"
             query = query.where(m.Job.title.ilike(like))
         if skill is not None:
-            query = query.join(m.JobSkill, m.JobSkill.job_id == m.Job.id).join(
-                m.Skill, m.Skill.id == m.JobSkill.skill_id
-            ).where(m.Skill.canonical_name == skill)
+            query = (
+                query.join(m.JobSkill, m.JobSkill.job_id == m.Job.id)
+                .join(m.Skill, m.Skill.id == m.JobSkill.skill_id)
+                .where(m.Skill.canonical_name == skill)
+            )
 
         rows = session.execute(query.order_by(m.Job.last_seen_at.desc()).limit(limit)).all()
         return [
