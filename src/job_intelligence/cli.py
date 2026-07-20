@@ -2,7 +2,8 @@
 
 `scrape` runs extraction directly, in-process. `temporal-run` / `schedule-*`
 orchestrate the same work through Temporal (retries, timeouts, history).
-`app` (Streamlit UI) is not yet wired — arrives in Milestone 7.
+`app` launches the Streamlit dashboards; `seed-demo` backfills synthetic
+monthly history for trend views; `export` writes CSVs to data/exports/.
 """
 
 from __future__ import annotations
@@ -187,8 +188,48 @@ def schedule_delete() -> None:
 
 @app.command(name="app")
 def streamlit_app() -> None:
-    """Launch the Streamlit UI. Arrives in Milestone 7."""
-    _not_yet("Milestone 7 (Streamlit UI)")
+    """Launch the Streamlit UI (Executive Overview + 6 pages)."""
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    home = Path(__file__).parent / "app" / "Home.py"
+    subprocess.run([sys.executable, "-m", "streamlit", "run", str(home)], check=False)
+
+
+@app.command(name="seed-demo")
+def seed_demo(
+    months: int = typer.Option(6, help="Number of months of synthetic history to backfill"),
+) -> None:
+    """Backfill synthetic demo history (data_source=synthetic) for trend views.
+
+    Never overwrites a month that already has live data — see
+    processing/synthetic_demo.py.
+    """
+    from .processing.synthetic_demo import generate_synthetic_history
+
+    created = generate_synthetic_history(months=months)
+    typer.echo(f"Created/updated {created} synthetic monthly_company_metrics row(s).")
+
+
+@app.command()
+def export(
+    fmt: str = typer.Option("csv", "--format", help="Export format (csv only for now)"),
+) -> None:
+    """Export normalized active jobs and aggregated insights to data/exports/."""
+    if fmt != "csv":
+        typer.echo(f"Unsupported format: {fmt!r} (only 'csv' is supported)", err=True)
+        raise typer.Exit(1)
+
+    from .analytics.exports import (
+        export_active_jobs,
+        export_company_skill_summary,
+        export_monthly_role_summary,
+    )
+
+    paths = (export_active_jobs(), export_company_skill_summary(), export_monthly_role_summary())
+    for path in paths:
+        typer.echo(f"Wrote {path}")
 
 
 if __name__ == "__main__":

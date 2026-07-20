@@ -216,3 +216,4 @@ class MonthlyCompanyMetrics(Base):
     top_skills_json: Mapped[list] = mapped_column(JSON, default=list)
     top_locations_json: Mapped[list] = mapped_column(JSON, default=list)
     calculated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    data_source: Mapped[str] = mapped_column(String(16), default="live", index=True)

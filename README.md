@@ -98,7 +98,18 @@ uv run job-intel schedule-delete
 ```
 
 ## 11. Streamlit
-> Arrives in Milestone 7. `uv run job-intel app`.
+```bash
+uv run job-intel seed-demo --months 6   # optional: backfill synthetic trend history
+uv run job-intel app                    # launches http://localhost:8501
+```
+Seven pages: Executive Overview (Home), Company Intelligence, Job Explorer,
+Skill Intelligence, Monthly Comparison, Ask the Data, Pipeline Operations.
+Synthetic demo rows are always labeled 🟡 SYNTHETIC DEMO DATA and never
+overwrite real (🟢 LIVE) data for the same period.
+
+```bash
+uv run job-intel export --format csv    # writes to data/exports/
+```
 
 ## 12. Tests
 ```bash

@@ -7,7 +7,7 @@
 - [x] **M4** — Goldman Sachs + BNY adapters (offline respx-tested; both verified live via reconnaissance)
 - [x] **M5** — Temporal workflows / activities / worker / schedule (tested against Temporal's real ephemeral test server)
 - [x] **M6** — lifecycle (grace-period closure), deterministic skills/role classification, analytics, summaries
-- [ ] **M7** — Streamlit pages, synthetic demo history, CSV exports
+- [x] **M7** — Streamlit pages (all 7), synthetic demo history, CSV exports — driven end to end with Streamlit's AppTest harness + a real background server boot check, zero exceptions
 - [ ] **M8** — lint/type/test, README verification, limitations & roadmap
 
 ## Documented Milestone 6 simplification
