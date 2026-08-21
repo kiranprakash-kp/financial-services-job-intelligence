@@ -1,0 +1,61 @@
+company,skill,count
+GOLDMAN_SACHS,Investment Banking,234
+GOLDMAN_SACHS,Securities,232
+GOLDMAN_SACHS,Wealth Management,172
+GOLDMAN_SACHS,Risk Management,150
+GOLDMAN_SACHS,Python,77
+GOLDMAN_SACHS,Asset Management,75
+GOLDMAN_SACHS,Project Management,66
+GOLDMAN_SACHS,Java,63
+GOLDMAN_SACHS,SQL,57
+GOLDMAN_SACHS,Machine Learning,49
+GOLDMAN_SACHS,Agile,39
+GOLDMAN_SACHS,AWS,36
+GOLDMAN_SACHS,Product Management,36
+GOLDMAN_SACHS,Treasury,35
+GOLDMAN_SACHS,C++,34
+GOLDMAN_SACHS,Capital Markets,30
+GOLDMAN_SACHS,CI/CD,29
+GOLDMAN_SACHS,Operational Risk,28
+GOLDMAN_SACHS,Payments,26
+GOLDMAN_SACHS,Regulatory Reporting,26
+WELLS_FARGO,Payments,224
+WELLS_FARGO,Securities,222
+WELLS_FARGO,Risk Management,208
+WELLS_FARGO,Treasury,101
+WELLS_FARGO,Operational Risk,64
+WELLS_FARGO,Fraud,51
+WELLS_FARGO,Investment Banking,31
+WELLS_FARGO,Product Management,31
+WELLS_FARGO,Python,30
+WELLS_FARGO,Capital Markets,26
+WELLS_FARGO,Agile,22
+WELLS_FARGO,SQL,19
+WELLS_FARGO,CI/CD,18
+WELLS_FARGO,Machine Learning,15
+WELLS_FARGO,Wealth Management,15
+WELLS_FARGO,Credit Risk,14
+WELLS_FARGO,Java,14
+WELLS_FARGO,Project Management,13
+WELLS_FARGO,AWS,12
+WELLS_FARGO,Azure,12
+BNY,Securities,105
+BNY,Agile,98
+BNY,Risk Management,93
+BNY,SQL,70
+BNY,Product Management,68
+BNY,Java,66
+BNY,CI/CD,65
+BNY,Stakeholder Management,55
+BNY,Python,46
+BNY,Payments,44
+BNY,Oracle,43
+BNY,Go,40
+BNY,JavaScript,37
+BNY,Machine Learning,34
+BNY,Wealth Management,34
+BNY,Operational Risk,33
+BNY,Scrum,32
+BNY,Capital Markets,28
+BNY,KYC,28
+BNY,Treasury,25
