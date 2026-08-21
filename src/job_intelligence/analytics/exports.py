@@ -11,7 +11,7 @@ from pathlib import Path
 
 from sqlalchemy import select
 
-from ..config import get_settings
+from ..config import get_settings, load_companies_config
 from ..persistence import orm_models as m
 from ..persistence.database import get_sessionmaker
 from . import metrics
@@ -36,14 +36,23 @@ def _write_csv(path: Path, rows: list[dict]) -> Path:
     return path
 
 
-def export_active_jobs() -> Path:
+def export_active_jobs(company_key: str | None = None) -> Path:
+    """Export active jobs to CSV. Pass `company_key` (a config/companies.yml key,
+    e.g. "barclays") to scope the export to one bank; omit for all companies."""
+    query = (
+        select(m.Job, m.Company.code)
+        .join(m.Company, m.Company.id == m.Job.company_id)
+        .where(m.Job.is_active.is_(True))
+    )
+    name_suffix = ""
+    if company_key is not None:
+        code = load_companies_config().get(company_key).code
+        query = query.where(m.Company.code == code)
+        name_suffix = f"_{company_key}"
+
     Session = get_sessionmaker()
     with Session() as session:
-        rows = session.execute(
-            select(m.Job, m.Company.code)
-            .join(m.Company, m.Company.id == m.Job.company_id)
-            .where(m.Job.is_active.is_(True))
-        ).all()
+        rows = session.execute(query).all()
         data = [
             {
                 "company": code,
@@ -55,6 +64,9 @@ def export_active_jobs() -> Path:
                 "country": job.country,
                 "workplace_type": job.workplace_type,
                 "employment_type": job.employment_type,
+                "description_text": job.description_text,
+                "qualifications_text": job.qualifications_text,
+                "responsibilities_text": job.responsibilities_text,
                 "first_seen_at": job.first_seen_at,
                 "source_posted_at": job.source_posted_at,
                 "posting_url": job.posting_url,
@@ -62,7 +74,7 @@ def export_active_jobs() -> Path:
             for job, code in rows
         ]
     stamp = datetime.now(UTC).strftime(_TIMESTAMP_FMT)
-    return _write_csv(_exports_dir() / f"active_jobs_{stamp}.csv", data)
+    return _write_csv(_exports_dir() / f"active_jobs{name_suffix}_{stamp}.csv", data)
 
 
 def export_company_skill_summary() -> Path:
